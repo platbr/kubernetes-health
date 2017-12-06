@@ -1,0 +1,1 @@
+require "kubernetes/health/version"
