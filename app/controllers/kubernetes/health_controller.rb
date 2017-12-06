@@ -1,10 +1,10 @@
 module Kubernetes
-  class HealthController < ActiveController::Base
+  class HealthController < ::ActionController::Base
     def status
-      if ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples == 1
-        head 200
-      else
+      if Kubernetes::Health::Config.sick_if.call
         head 503
+      else
+        head 200
       end
     end
   end

@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  get '/_health', to: 'kubernetes/health#status'
+  get Kubernetes::Health::Config.route, to: 'kubernetes/health#status'
 end
