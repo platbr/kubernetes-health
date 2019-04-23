@@ -22,10 +22,10 @@ Or install it yourself as:
 
 Set Kubernetes::Health::Config.sick_if if you want to check other things.
 
-Ex. Check if PostgreSQL is working and wait for migrations.
+Ex. Check if PostgreSQL is working and wait for migrates.
 ```
 Kubernetes::Health::Config.sick_if = lambda { |params|
-    return true if params[:wait_migration] == 'true' && File.exists?('migration.lock')
+    return true if params[:wait_migrates] == 'true' && File.exists?('migrates.lock')
     ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
 }
 ```
