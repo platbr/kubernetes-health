@@ -7,7 +7,7 @@ A simple gem that adds /_health in your APP.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'kubernetes-health'
+gem 'kubernetes-health', '~> 1.0'
 ```
 
 And then execute:
@@ -22,9 +22,12 @@ Or install it yourself as:
 
 Set Kubernetes::Health::Config.sick_if if you want to check other things.
 
-Ex. Check if PostgreSQL is working.
+Ex. Check if PostgreSQL is working and wait for migrations.
 ```
-Kubernetes::Health::Config.sick_if = lambda { ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1 }
+Kubernetes::Health::Config.sick_if = lambda { |params|
+    return true if params[:wait_migration] == 'true' && File.exists?('migration.lock')
+    ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
+}
 ```
 
 ## Custom route
