@@ -5,7 +5,7 @@ A gem that adds `/_readiness` and `/_liveness` and allows Kubernetes monitor you
 # Features
 - add routes `/_readiness` and `/_liveness` on rails stack by default.
 - allow custom checks for `/_readiness` and `/_liveness` on rails stack.
-- add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs optionally. 
+- add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs. (optional). 
 
 # How it works
 It will run a RACK server for `/_readiness` and `/_liveness` routes when a `rake db:migrate` runs and it will return `200` and `503` HTTP CODES alternately avoiding to reach `failureThreshold` or `successThreshold`.
