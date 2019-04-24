@@ -2,6 +2,14 @@
 
 A gem that adds `/_readiness` and `/_liveness` and allows Kubernetes monitor your rails using HTTP while migrates are running.
 
+# Features
+- add routes `/_readiness` and `/_liveness` on rails stack by default.
+- allow custom checks for `/_readiness` and `/_liveness` on rails stack.
+- add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs optionally. 
+
+# How it works
+It will run a RACK server for `/_readiness` and `/_liveness` routes when a `rake db:migrate` runs and it will return `200` and `503` HTTP CODES alternately avoiding to reach `failureThreshold` or `successThreshold`.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -14,31 +22,28 @@ And then execute:
 
 $ bundle
 
-## Enable migrates monitoring.
-
-It will run a Rack server for `/_readiness` route and will return `200` and `503` HTTP CODES alternately while your migrates are running.
-
-If readinessProbe\'s failureThreshold=3 and successThreshold=3 it will never be reach until migrate finish.
+## Enabling monitoring while `rake db:migrate` runs
 
 Your Dockerfile's entry script needs to run migrates before start your web app.
 
 Add `KUBERNETES_HEALTH_ENABLE_RACK_ON_MIGRATE=true` environment variable.
 
-or
+or add in your `application.rb`.
 
 ```
-    Kubernetes::Health::Config.enable_rack_on_migrate = true # default: false
+    # default: false
+    Kubernetes::Health::Config.enable_rack_on_migrate = true
 ```
 
-On your app.
-
-If you need custom HTTP rotating codes:
+If you need customize http rotating codes:
 
 ```
-    Kubernetes::Health::Config.rack_on_migrate_rotate_http_codes = [200, 503] # default: [202, 503]
+    # default: [202, 503]
+    Kubernetes::Health::Config.rack_on_migrate_rotate_http_codes = [200, 503]
 ```
 
 In Kubernetes you need to configure your deployment `readinessProbe` like this:
+
 ```
     readinessProbe:
         httpGet:
@@ -50,26 +55,25 @@ In Kubernetes you need to configure your deployment `readinessProbe` like this:
         successThreshold: 3
 ```
 
+The `failureThreshold` and `successThreshold` values must to greater than `2` forcing kubernetes to wait once `/_readiness` route will return `200` and `503` HTTP CODES alternately.
+
 ## Custom check
 
-Set Kubernetes::Health::Config.ready_if if you want to check other things.
+This custom only works for routes in rails stack, they are not executed while `rake db:migrate` runs.
 
-Ex. Check if PostgreSQL is working. `params` is optional.
+Ex. Check if PostgreSQL is reachable. `params` is optional.
+
 ```
 Kubernetes::Health::Config.ready_if = lambda { |params|
     ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
 }
 ```
 
-Set Kubernetes::Health::Config.live_if if you want to check other things.
-
-Ex. Check if PostgreSQL is working. `params` is optional.
 ```
-Kubernetes::Health::Config.ready_if = lambda { |params|
+Kubernetes::Health::Config.live_if = lambda { |params|
     ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
 }
 ```
-
 
 ## Custom routes
 ```
