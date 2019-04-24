@@ -9,8 +9,14 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Wagner Caixeta"]
   spec.email         = ["wagner@baladapp.com.br"]
 
-  spec.summary       = %q{A simple gem to add /_health to your Rails APP.}
-  spec.description   = %q{A simple gem to add /_health to your Rails APP for using with Kubernetes}
+  spec.summary       = %q{This gem allows kubernetes monitoring your app while it is running migrates and after it started.}
+  spec.description   = %q{
+    This gem allows kubernetes monitoring your app while it is running migrates and after it started.
+    Features:
+    * add routes /_readiness and /_liveness on rails stack by default;
+    * allow custom checks for /_readiness and /_liveness on rails stack;
+    * add routes /_readiness and /_liveness while rake db:migrate runs.
+  }
   spec.homepage      = "https://github.com/platbr/kubernetes-health"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
