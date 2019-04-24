@@ -1,9 +1,15 @@
 module Kubernetes
   class HealthController < ::ActionController::Base
-    def status
-      i_am_sick = Kubernetes::Health::Config.sick_if.arity == 0 ? Kubernetes::Health::Config.sick_if.call : Kubernetes::Health::Config.sick_if.call(params)
-      return head 503 if i_am_sick
-      head 200
+    def liveness
+      i_am_live = Kubernetes::Health::Config.live_if.arity == 0 ? Kubernetes::Health::Config.live_if.call : Kubernetes::Health::Config.live_if.call(params)
+      return head 200 if i_am_live
+      head 503
+    end
+
+    def readiness
+      i_am_ready = Kubernetes::Health::Config.ready_if.arity == 0 ? Kubernetes::Health::Config.ready_if.call : Kubernetes::Health::Config.ready_if.call(params)
+      return head 200 if i_am_ready
+      head 503
     end
   end
 end
