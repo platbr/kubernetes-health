@@ -47,7 +47,7 @@ In Kubernetes you need to configure your deployment `readinessProbe` like this:
 ```
 
 ### How `rake db:migrate` monitoring works
-It will run a RACK server for `/_readiness` and `/_liveness` routes while a `rake db:migrate` is running.
+It will run a RACK server for `/_readiness` and `/_liveness` routes while `rake db:migrate` is running.
 
 ## Avoid `rake db:migrate` parallel running.
 
