@@ -31,7 +31,7 @@ or add in your `application.rb`.
 If you need customize http rotating codes:
 
 ```
-    # default: [202, 503]
+    # default: [200, 503]
     Kubernetes::Health::Config.rack_on_migrate_rotate_http_codes = [200, 503]
 ```
 
