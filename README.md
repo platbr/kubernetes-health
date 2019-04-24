@@ -16,11 +16,11 @@ $ bundle
 
 ## Enable migrates monitoring.
 
-This will run a Rack server for `/_readiness` route and will return `200` and `503` HTTP CODES alternately while your migrates are running.
+It will run a Rack server for `/_readiness` route and will return `200` and `503` HTTP CODES alternately while your migrates are running.
 
-If readinessProbe\`s failureThreshold=3 and successThreshold=3 it never will be reach until migrate ends.
+If readinessProbe\'s failureThreshold=3 and successThreshold=3 it will never be reach until migrate finish.
 
-Of course your Dockerfile entry script needs to run migrates before start your web app.
+Your Dockerfile's entry script needs to run migrates before start your web app.
 
 Add `KUBERNETES_HEALTH_ENABLE_RACK_ON_MIGRATE=true` environment variable.
 
@@ -32,13 +32,13 @@ or
 
 On your app.
 
-If you need:
+If you need custom HTTP rotating codes:
 
 ```
     Kubernetes::Health::Config.rack_on_migrate_rotate_http_codes = [200, 503] # default: [202, 503]
 ```
 
-Configure your deployment readinessProbe:
+In Kubernetes you need to configure your deployment `readinessProbe` like this:
 ```
     readinessProbe:
         httpGet:
