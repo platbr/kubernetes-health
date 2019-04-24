@@ -8,9 +8,7 @@ namespace :kubernetes_health do
         readiness = req.path_info == "#{Kubernetes::Health::Config.route_readiness}"
         liveness = req.path_info == "#{Kubernetes::Health::Config.route_liveness}"
         if readiness
-          @counter=@counter+1
-          http_codes = Kubernetes::Health::Config.rack_on_migrate_rotate_http_codes
-          http_code = http_codes[(@counter % http_codes.size)]
+          http_code = 503
         elsif liveness
           http_code = 200
         else
