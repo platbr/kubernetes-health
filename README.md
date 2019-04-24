@@ -54,7 +54,7 @@ In Kubernetes you need to configure your deployment `readinessProbe` like this:
 
 Set Kubernetes::Health::Config.ready_if if you want to check other things.
 
-Ex. Check if PostgreSQL is working. `params` is optional.
+Ex. Check if PostgreSQL is working. `params` is optional.
 ```
 Kubernetes::Health::Config.ready_if = lambda { |params|
     ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
@@ -63,7 +63,7 @@ Kubernetes::Health::Config.ready_if = lambda { |params|
 
 Set Kubernetes::Health::Config.live_if if you want to check other things.
 
-Ex. Check if PostgreSQL is working. `params` is optional.
+Ex. Check if PostgreSQL is working. `params` is optional.
 ```
 Kubernetes::Health::Config.ready_if = lambda { |params|
     ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
