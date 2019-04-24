@@ -28,30 +28,25 @@ or add in your `application.rb`.
     Kubernetes::Health::Config.enable_rack_on_migrate = true
 ```
 
-If you need customize http rotating codes:
-
-```
-    # default: [200, 503]
-    Kubernetes::Health::Config.rack_on_migrate_rotate_http_codes = [200, 503]
-```
-
 In Kubernetes you need to configure your deployment `readinessProbe` like this:
 
 ```
+    livenessProbe:
+        httpGet:
+        path: /_liveness
+        port: 80
+        initialDelaySeconds: 10
+        timeoutSeconds: 5
     readinessProbe:
         httpGet:
         path: /_readiness
         port: 80
         initialDelaySeconds: 10
         timeoutSeconds: 5
-        failureThreshold: 3
-        successThreshold: 3
 ```
 
 ### How `rake db:migrate` monitoring works
-It will run a RACK server for `/_readiness` and `/_liveness` routes while a `rake db:migrate` runs and it will return `200` and `503` HTTP CODES alternately avoiding to reach `failureThreshold` or `successThreshold`.
-
-The `failureThreshold` and `successThreshold` values must to greater than `2` forcing kubernetes to wait.
+It will run a RACK server for `/_readiness` and `/_liveness` routes while a `rake db:migrate` is running.
 
 ## Customizing checks
 

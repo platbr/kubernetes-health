@@ -2,14 +2,12 @@ namespace :kubernetes_health do
   task :before_migrate do
     Thread.new {
       require 'rack'
-      @counter=0
       Rack::Handler.default.run ->(env) {
         req = Rack::Request.new(env)
-        readiness = req.path_info == "#{Kubernetes::Health::Config.route_readiness}"
-        liveness = req.path_info == "#{Kubernetes::Health::Config.route_liveness}"
-        if readiness
+        case req.path_info
+        when Kubernetes::Health::Config.route_readiness
           http_code = 503
-        elsif liveness
+        when Kubernetes::Health::Config.route_liveness
           http_code = 200
         else
           http_code = 404

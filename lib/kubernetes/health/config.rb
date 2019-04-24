@@ -4,7 +4,6 @@ module Kubernetes
       @@live_if = lambda { true }
       @@ready_if = lambda { true }
       @@enable_rack_on_migrate = ActiveRecord::Type::Boolean.new.cast(ENV['KUBERNETES_HEALTH_ENABLE_RACK_ON_MIGRATE']) || false
-      @@rack_on_migrate_rotate_http_codes = [503, 200]
       @@route_liveness = '/_liveness'
       @@route_readiness = '/_readiness'
 
@@ -14,14 +13,6 @@ module Kubernetes
 
       def self.enable_rack_on_migrate=(value)
         @@enable_rack_on_migrate = value
-      end
-
-      def self.rack_on_migrate_rotate_http_codes
-        @@rack_on_migrate_rotate_http_codes
-      end
-
-      def self.rack_on_migrate_rotate_http_codes=(value)
-        @@rack_on_migrate_rotate_http_codes = value
       end
 
       def self.route_liveness
