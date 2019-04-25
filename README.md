@@ -29,22 +29,27 @@ or add in your `application.rb`.
 Kubernetes::Health::Config.enable_rack_on_migrate = true
 ```
 
-In Kubernetes you need to configure your deployment `readinessProbe` like this:
+In Kubernetes you need to configure your deployment `readinessProbe` and `livenessProbe` like this:
 
 ```
-    livenessProbe:
-        httpGet:
-        path: /_liveness
-        port: 80
-        initialDelaySeconds: 10
-        timeoutSeconds: 5
-    readinessProbe:
-        httpGet:
-        path: /_readiness
-        port: 80
-        initialDelaySeconds: 10
-        timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /_liveness
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /_readiness
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 3
 ```
+Setting `failureThreshold` is import to avoid problems when yout app finish migrates and is starting the web process.
 
 ### How `rake db:migrate` monitoring works
 It will run a RACK server for `/_readiness` and `/_liveness` routes while `rake db:migrate` is running.
