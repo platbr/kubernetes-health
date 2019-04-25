@@ -54,7 +54,10 @@ Setting `failureThreshold` is import to avoid problems when yout app finish migr
 ### How `rake db:migrate` monitoring works
 It will run a RACK server for `/_readiness` and `/_liveness` routes while `rake db:migrate` is running.
 
-## Avoid `rake db:migrate` parallel running.
+## Avoiding migrations running in parallel and making kubernetes happy.
+Rails already avoid migrations running in parallel, but it raise exceptions. This gem will just wait for other migrations without exit.
+If you enable `rack_on_migrate` together with this, kubernetes will just wait, avoiding erros.
+
 
 Add `KUBERNETES_HEALTH_ENABLE_LOCK_ON_MIGRATE=true` environment variable.
 
