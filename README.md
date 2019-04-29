@@ -87,14 +87,14 @@ It only works for routes in rails stack, they are not executed while `rake db:mi
 Ex. Check if PostgreSQL is reachable. `params` is optional.
 
 ```
-Kubernetes::Health::Config.ready_if = lambda { |params|
-    ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
+Kubernetes::Health::Config.live_if = lambda { |params|
+  true
 }
 ```
 
 ```
-Kubernetes::Health::Config.live_if = lambda { |params|
-    ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
+Kubernetes::Health::Config.ready_if = lambda { |params|
+  ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
 }
 ```
 
