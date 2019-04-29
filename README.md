@@ -84,8 +84,7 @@ Kubernetes::Health::Config.unlock = lambda {
 
 It only works for routes in rails stack, they are not executed while `rake db:migrate` runs.
 
-
-I prefer do nothing else on `liveness`. `params` is optional.
+I prefer do nothing else on `liveness` to avoid unnecessary `CrashLoopBackOff` status. `params` is optional.
 
 ```
 Kubernetes::Health::Config.live_if = lambda {
