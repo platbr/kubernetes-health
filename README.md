@@ -49,7 +49,7 @@ In Kubernetes you need to configure your deployment `readinessProbe` and `livene
           failureThreshold: 3
           successThreshold: 3
 ```
-Setting `failureThreshold` is import to avoid problems when yout app finish migrates and is starting the web process.
+Setting `failureThreshold` is import to avoid problems when app finish migrates and is starting the web process.
 
 ### How `rake db:migrate` monitoring works
 It will run a RACK server for `/_readiness` and `/_liveness` routes while `rake db:migrate` is running.
