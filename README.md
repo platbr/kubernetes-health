@@ -55,8 +55,8 @@ Setting `failureThreshold` is import to avoid problems when app finish migrates 
   template:
     metadata:
       annotations:
-        prometheus.io/path: '/_metrics',
-        prometheus.io/port: '9393',
+        prometheus.io/path: '/_metrics'
+        prometheus.io/port: '9393'
         prometheus.io/scrape: 'true'
 ```
 
