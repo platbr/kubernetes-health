@@ -1,4 +1,3 @@
-require 'json'
 require "kubernetes/health/config"
 require 'prometheus/client/formats/text'
 require 'puma/kubernetes/parser'
