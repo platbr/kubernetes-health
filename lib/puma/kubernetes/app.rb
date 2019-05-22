@@ -31,7 +31,7 @@ module Puma
         else
           http_code = 404
         end
-        Rails.logger.info "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}" rescue nil
+        Rails.logger.info "Kubernetes Health: Puma Plugin - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}" rescue nil
         [http_code, type, content]
       end
     end
