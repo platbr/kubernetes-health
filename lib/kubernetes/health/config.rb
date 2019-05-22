@@ -3,10 +3,11 @@ module Kubernetes
     class Config
       @@live_if = lambda { true }
       @@ready_if = lambda { true }
-      @@enable_lock_on_migrate = ActiveRecord::Type::Boolean.new.cast(ENV['KUBERNETES_HEALTH_ENABLE_LOCK_ON_MIGRATE']) || false
-      @@enable_rack_on_migrate = ActiveRecord::Type::Boolean.new.cast(ENV['KUBERNETES_HEALTH_ENABLE_RACK_ON_MIGRATE']) || false
+      @@enable_lock_on_migrate = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_LOCK_ON_MIGRATE']
+      @@enable_rack_on_migrate = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_RACK_ON_MIGRATE']
       @@route_liveness = '/_liveness'
       @@route_readiness = '/_readiness'
+      @@route_metrics = '/_metrics'
       @@lock_or_wait = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_lock(123456789123456789);' }
       @@unlock = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_unlock(123456789123456789);' }
 
@@ -40,6 +41,14 @@ module Kubernetes
 
       def self.enable_rack_on_migrate=(value)
         @@enable_rack_on_migrate = value
+      end
+
+      def self.route_metrics
+        @@route_metrics
+      end
+
+      def self.route_metrics=(value)
+        @@route_metrics = value
       end
 
       def self.route_liveness

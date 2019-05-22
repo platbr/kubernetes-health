@@ -3,8 +3,10 @@
 This gem allows kubernetes monitoring your app while it is running migrates and after it started.
 
 # Features
-- add routes `/_readiness` and `/_liveness` on rails stack by default.
-- allow custom checks for `/_readiness` and `/_liveness` on rails stack.
+- add routes `/_readiness`, `/_liveness` on rails stack.
+- add routes `/_readiness`, `/_liveness` and `/_metrics` as a puma plugin.
+- metrics are prometheus compatible (code copied from `puma-metrics` gem).
+- allow custom checks for `/_readiness` and `/_liveness`.
 - add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs. (optional)
 - add support to avoid parallel running of `rake db:migrate` while keep kubernetes waiting. (optional)
 
@@ -13,7 +15,49 @@ This gem allows kubernetes monitoring your app while it is running migrates and 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'kubernetes-health', '~> 2.1'
+gem 'kubernetes-health', '~> 3.0'
+```
+
+## Enabling puma plugin
+
+add in `config/puma.rb`
+```
+plugin 'kubernetes'
+kubernetes_url 'tcp://0.0.0.0:9393'
+```
+
+In Kubernetes you need to configure your deployment `readinessProbe` and `livenessProbe` like this:
+
+```
+        livenessProbe:
+          httpGet:
+            path: /_liveness
+            port: 9393
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /_readiness
+            port: 9393
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+```
+
+Setting `failureThreshold` is import to avoid problems when app finish migrates and is starting the web process.
+
+## Enabling prometheus metrics
+
+```
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: '/_metrics',
+        prometheus.io/port: '9393',
+        prometheus.io/scrape: 'true'
 ```
 
 ## Enabling monitoring while `rake db:migrate` runs
@@ -28,28 +72,6 @@ or add in your `application.rb`.
 # default: false
 Kubernetes::Health::Config.enable_rack_on_migrate = true
 ```
-
-In Kubernetes you need to configure your deployment `readinessProbe` and `livenessProbe` like this:
-
-```
-        livenessProbe:
-          httpGet:
-            path: /_liveness
-            port: 3000
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
-          successThreshold: 1
-        readinessProbe:
-          httpGet:
-            path: /_readiness
-            port: 3000
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
-          successThreshold: 3
-```
-Setting `failureThreshold` is import to avoid problems when app finish migrates and is starting the web process.
 
 ### How `rake db:migrate` monitoring works
 It will run a RACK server for `/_readiness` and `/_liveness` routes while `rake db:migrate` is running.
@@ -102,5 +124,6 @@ Kubernetes::Health::Config.ready_if = lambda { |params|
 ## Customizing routes
 ```
 Kubernetes::Health::Config.route_liveness = '/liveness'
-Kubernetes::Health::Config.route_readiness = '/readiness
+Kubernetes::Health::Config.route_readiness = '/readiness'
+Kubernetes::Health::Config.route_metrics = '/metrics'
 ```

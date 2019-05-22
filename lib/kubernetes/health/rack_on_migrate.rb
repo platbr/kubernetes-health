@@ -2,7 +2,7 @@ module Kubernetes
   module Health
     class RackOnMigrate
       def call(env)
-        req = Rack::Request.new(env)
+        req = ::Rack::Request.new(env)
         case req.path_info
         when Kubernetes::Health::Config.route_readiness
           http_code = 503
