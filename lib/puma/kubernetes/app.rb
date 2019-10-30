@@ -17,10 +17,10 @@ module Puma
         type = {}
         content = []
         case req.path_info
-        when ::Kubernetes::Health::Config.route_readiness
+        when ::Kubernetes::Health::Config.route_liveness
           i_am_live = ::Kubernetes::Health::Config.live_if.arity == 0 ? ::Kubernetes::Health::Config.live_if.call : ::Kubernetes::Health::Config.live_if.call(req.params)
           http_code = i_am_live ? 200 : 503
-        when ::Kubernetes::Health::Config.route_liveness
+        when ::Kubernetes::Health::Config.route_readiness
           i_am_ready = ::Kubernetes::Health::Config.ready_if.arity == 0 ? ::Kubernetes::Health::Config.ready_if.call : ::Kubernetes::Health::Config.ready_if.call(req.params)
           http_code = i_am_ready ? 200 : 503
         when ::Kubernetes::Health::Config.route_metrics
