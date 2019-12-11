@@ -11,7 +11,7 @@ module Kubernetes
         else
           http_code = 404
         end
-        Rails.logger.info "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}"
+        Rails.logger.debug "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}"
         [http_code, {}, []]
       end
     end
