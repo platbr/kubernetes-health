@@ -127,3 +127,13 @@ Kubernetes::Health::Config.route_liveness = '/liveness'
 Kubernetes::Health::Config.route_readiness = '/readiness'
 Kubernetes::Health::Config.route_metrics = '/metrics'
 ```
+
+## Logger and log log level
+
+If you want to change the logger and the log level add the following in the application.rb file (most like this will be in the config/environments/production.rb)
+```
+# default is: ActiveSupport::Logger.new($stdout)
+Kubernetes::Health::Config.logger = Log4r::Logger.new("Application Log")
+# default is: :debug
+Kubernetes::Health::Config.log_level = :info
+```

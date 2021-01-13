@@ -1,3 +1,5 @@
+require "active_support/all"
+
 module Kubernetes
   module Health
     class Config
@@ -10,6 +12,21 @@ module Kubernetes
       @@route_metrics = '/_metrics'
       @@lock_or_wait = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_lock(123456789123456789);' }
       @@unlock = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_unlock(123456789123456789);' }
+
+      @@logger = ::ActiveSupport::Logger.new($stdout)
+      # :debug, :info, :warn, :error, :fatal and :unknown
+      @@logger.level = :debug
+      def self.logger
+        @@logger
+      end
+
+      def self.logger=(value)
+        @@logger = value
+      end
+
+      def self.log_level=(value)
+        @@logger.level = value
+      end
 
       def self.lock_or_wait
         @@lock_or_wait
@@ -82,7 +99,6 @@ module Kubernetes
       def self.ready_if=(value)
         @@ready_if = value
       end
-
     end
   end
 end
