@@ -106,18 +106,19 @@ Kubernetes::Health::Config.unlock = lambda {
 
 It only works for routes in rails stack, they are not executed while `rake db:migrate` runs.
 
-I prefer do nothing else on `liveness` to avoid unnecessary `CrashLoopBackOff` status. `params` is optional.
+I prefer do nothing else on `liveness` to avoid unnecessary `CrashLoopBackOff` status. `params` is optional (request params).
 
 ```
-Kubernetes::Health::Config.live_if = lambda {
+Kubernetes::Health::Config.live_if = lambda { |params|
   true
 }
 
 ```
-Ex. Check if PostgreSQL is reachable on `readiness`. `params` is optional.
+Ex. Check if PostgreSQL is reachable on `readiness` indicating that credentials are setup right and keeps cache to avoid doing it a lot. `params` is optional (request params).
 ```
 Kubernetes::Health::Config.ready_if = lambda { |params|
-  ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples != 1
+  return $kubernetes_health_test_db_connection if $kubernetes_health_test_db_connection
+  $kubernetes_health_test_db_connection = ActiveRecord::Base.connection.execute("SELECT 1").cmd_tuples == 1
 }
 ```
 
