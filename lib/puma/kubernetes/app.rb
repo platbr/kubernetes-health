@@ -13,23 +13,28 @@ module Puma
       end
 
       def call(_env)
-        req = ::Rack::Request.new(_env)
-        type = {}
-        content = []
-        case req.path_info
-        when ::Kubernetes::Health::Config.route_liveness
-          i_am_live = ::Kubernetes::Health::Config.live_if.arity == 0 ? ::Kubernetes::Health::Config.live_if.call : ::Kubernetes::Health::Config.live_if.call(req.params)
-          http_code = i_am_live ? 200 : 503
-        when ::Kubernetes::Health::Config.route_readiness
-          i_am_ready = ::Kubernetes::Health::Config.ready_if.arity == 0 ? ::Kubernetes::Health::Config.ready_if.call : ::Kubernetes::Health::Config.ready_if.call(req.params)
-          http_code = i_am_ready ? 200 : 503
-        when ::Kubernetes::Health::Config.route_metrics
-          http_code = 200
-          @parser.parse JSON.parse(@launcher.stats)
+        begin
+          req = ::Rack::Request.new(_env)
+          type = {}
+          content = []
           type = { 'Content-Type' => 'text/plain' }
-          content = [Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)]
-        else
-          http_code = 404
+          case req.path_info
+          when ::Kubernetes::Health::Config.route_liveness
+            i_am_live = ::Kubernetes::Health::Config.live_if.arity == 0 ? ::Kubernetes::Health::Config.live_if.call : ::Kubernetes::Health::Config.live_if.call(req.params)
+            http_code = i_am_live ? 200 : 503
+          when ::Kubernetes::Health::Config.route_readiness
+            i_am_ready = ::Kubernetes::Health::Config.ready_if.arity == 0 ? ::Kubernetes::Health::Config.ready_if.call : ::Kubernetes::Health::Config.ready_if.call(req.params)
+            http_code = i_am_ready ? 200 : 503
+          when ::Kubernetes::Health::Config.route_metrics
+            http_code = 200
+            @parser.parse JSON.parse(@launcher.stats)
+            content = [Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)]
+          else
+            http_code = 404
+          end
+        rescue
+          http_code = 500
+          content = []
         end
         ::Kubernetes::Health::Config.request_log_callback.call(req, http_code)
         [http_code, type, content]
