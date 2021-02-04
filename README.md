@@ -127,3 +127,11 @@ Kubernetes::Health::Config.route_liveness = '/liveness'
 Kubernetes::Health::Config.route_readiness = '/readiness'
 Kubernetes::Health::Config.route_metrics = '/metrics'
 ```
+
+## Customizing requests logs
+
+```
+Kubernetes::Health::Config.request_log_callback = lambda { |req, http_code|
+  Rails.logger.debug "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}"  rescue nil
+}
+```
