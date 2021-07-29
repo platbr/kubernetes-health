@@ -17,7 +17,7 @@ module Puma
           req = ::Rack::Request.new(_env)
           type = {}
           content = []
-          type = { 'Content-Type' => 'text/plain' }
+          type = ::Kubernetes::Health::Config.response_format == 'json' ? { 'Content-Type' => 'application/json' } : { 'Content-Type' => 'text/plain' }
           case req.path_info
           when ::Kubernetes::Health::Config.route_liveness
             i_am_live = ::Kubernetes::Health::Config.live_if.arity == 0 ? ::Kubernetes::Health::Config.live_if.call : ::Kubernetes::Health::Config.live_if.call(req.params)
@@ -28,7 +28,7 @@ module Puma
           when ::Kubernetes::Health::Config.route_metrics
             http_code = 200
             @parser.parse JSON.parse(@launcher.stats)
-            content = [Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)]
+            content = ::Kubernetes::Health::Config.response_format == 'json' ? @launcher.stats : Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)
           else
             http_code = 404
           end
@@ -36,8 +36,8 @@ module Puma
           http_code = 500
           content = []
         end
-        ::Kubernetes::Health::Config.request_log_callback.call(req, http_code)
-        [http_code, type, content]
+        ::Kubernetes::Health::Config.request_log_callback.call(req, http_code, content)
+        [http_code, type, [content]]
       end
     end
   end

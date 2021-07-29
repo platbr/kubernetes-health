@@ -48,18 +48,6 @@ In Kubernetes you need to configure your deployment `readinessProbe` and `livene
 ```
 
 Setting `failureThreshold` is import to avoid problems when app finish migrates and is starting the web process.
-
-## Enabling prometheus metrics
-
-```
-  template:
-    metadata:
-      annotations:
-        prometheus.io/path: '/_metrics'
-        prometheus.io/port: '9393'
-        prometheus.io/scrape: 'true'
-```
-
 ## Enabling monitoring while `rake db:migrate` runs
 
 Your Dockerfile's entry script needs to run migrates before start your web app.
@@ -127,6 +115,14 @@ Kubernetes::Health::Config.ready_if = lambda { |params|
 Kubernetes::Health::Config.route_liveness = '/liveness'
 Kubernetes::Health::Config.route_readiness = '/readiness'
 Kubernetes::Health::Config.route_metrics = '/metrics'
+```
+
+## Response format
+If you are using `https://github.com/zalando-incubator/kube-metrics-adapter` you will want to use `json` format.
+
+Default is `prometheus`.
+```
+Kubernetes::Health::Config.response_format = 'json'
 ```
 
 ## Customizing requests logs

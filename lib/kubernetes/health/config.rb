@@ -8,9 +8,10 @@ module Kubernetes
       @@route_liveness = '/_liveness'
       @@route_readiness = '/_readiness'
       @@route_metrics = '/_metrics'
-      
-      @@request_log_callback = lambda { |req, http_code|
-        Rails.logger.debug "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}"  rescue nil
+      @@response_format = 'prometheus'
+
+      @@request_log_callback = lambda { |req, http_code, content|
+        Rails.logger.debug "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}\n#{content}"  rescue nil
       }
 
       @@lock_or_wait = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_lock(123456789123456789);' }
@@ -23,7 +24,7 @@ module Kubernetes
       def self.lock_or_wait=(value)
         @@lock_or_wait = value
       end
-      
+
       def self.request_log_callback
         @@request_log_callback
       end
@@ -96,6 +97,13 @@ module Kubernetes
         @@ready_if = value
       end
 
+      def self.response_format
+        @@response_format
+      end
+
+      def self.response_format=(value)
+        @@response_format = value
+      end
     end
   end
 end
