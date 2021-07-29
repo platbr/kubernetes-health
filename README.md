@@ -15,7 +15,7 @@ This gem allows kubernetes monitoring your app while it is running migrates and 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'kubernetes-health', '~> 3.2'
+gem 'kubernetes-health', '~> 3.3'
 ```
 
 ## Enabling puma plugin
