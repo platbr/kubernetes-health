@@ -1,6 +1,6 @@
 # Kubernetes::Health
 
-This gem allows kubernetes monitoring your app while it is running migrates and after it start.
+This gem allows kubernetes monitoring your app while it is running migrates and after it starts.
 
 # Features
 - add routes `/_readiness`, `/_liveness` on rails stack.
