@@ -5,7 +5,7 @@ This gem allows kubernetes monitoring your app while it is running migrates and 
 # Features
 - add routes `/_readiness`, `/_liveness` on rails stack.
 - add routes `/_readiness`, `/_liveness` and `/_metrics` as a puma plugin.
-- metrics are prometheus compatible (code copied from `puma-metrics` gem).
+- metrics are prometheus compatible (code copied from `puma-metrics` gem) or json.
 - allow custom checks for `/_readiness` and `/_liveness`.
 - add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs. (optional)
 - add support to avoid parallel running of `rake db:migrate` while keep kubernetes waiting. (optional)
