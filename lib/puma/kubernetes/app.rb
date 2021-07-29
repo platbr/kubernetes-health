@@ -16,7 +16,7 @@ module Puma
         begin
           req = ::Rack::Request.new(_env)
           type = {}
-          content = []
+          content = ''
           type = ::Kubernetes::Health::Config.response_format == 'json' ? { 'Content-Type' => 'application/json' } : { 'Content-Type' => 'text/plain' }
           case req.path_info
           when ::Kubernetes::Health::Config.route_liveness
@@ -38,7 +38,7 @@ module Puma
           end
         rescue
           http_code = 500
-          content = []
+          content = ''
         end
         ::Kubernetes::Health::Config.request_log_callback.call(req, http_code, content)
         [http_code, type, [content]]
