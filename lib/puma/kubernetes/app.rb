@@ -27,8 +27,12 @@ module Puma
             http_code = i_am_ready ? 200 : 503
           when ::Kubernetes::Health::Config.route_metrics
             http_code = 200
-            @parser.parse JSON.parse(@launcher.stats)
-            content = ::Kubernetes::Health::Config.response_format == 'json' ? @launcher.stats : Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)
+            if ::Kubernetes::Health::Config.response_format == 'json'
+              content = include_puma_key_prefix(include_usage(JSON.parse(@launcher.stats))).to_json
+            else
+              @parser.parse include_usage(JSON.parse(@launcher.stats))
+              content = Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)
+            end
           else
             http_code = 404
           end
@@ -38,6 +42,18 @@ module Puma
         end
         ::Kubernetes::Health::Config.request_log_callback.call(req, http_code, content)
         [http_code, type, [content]]
+      end
+
+      def include_usage(stats)
+        stats['usage'] = (1 - stats['pool_capacity'].to_f / stats['max_threads']).round(2)
+        stats
+      end
+      def include_puma_key_prefix(stats)
+        result = {}
+        stats.each do |k,v|
+          result["puma_#{k}"] = v
+        end
+        result
       end
     end
   end

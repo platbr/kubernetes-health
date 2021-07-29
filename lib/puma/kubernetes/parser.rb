@@ -29,6 +29,7 @@ module Puma
         registry.gauge(:puma_pool_capacity, 'Number of allocatable worker threads', index: 0)
         registry.gauge(:puma_max_threads, 'Maximum number of worker threads', index: 0)
         registry.gauge(:puma_workers, 'Number of configured workers').set({}, 1)
+        registry.gauge(:puma_usage, 'Result of (1 - puma_pool_capacity/puma_max_threads)', index: 0)
       end
 
       def registry
