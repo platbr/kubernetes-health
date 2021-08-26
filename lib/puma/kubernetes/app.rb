@@ -28,15 +28,17 @@ module Puma
           when ::Kubernetes::Health::Config.route_metrics
             http_code = 200
             if ::Kubernetes::Health::Config.response_format == 'json'
-              content = include_puma_key_prefix(include_usage(JSON.parse(@launcher.stats))).to_json
+              content = include_puma_key_prefix(include_usage(@launcher.stats)).to_json
             else
-              @parser.parse include_usage(JSON.parse(@launcher.stats))
+              @parser.parse include_usage(@launcher.stats)
               content = Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)
             end
           else
             http_code = 404
           end
-        rescue
+        rescue => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
           http_code = 500
           content = ''
         end
@@ -45,6 +47,13 @@ module Puma
       end
 
       def include_usage(stats)
+        if stats.is_a?(String)
+          # puma <= 4.
+          stats = JSON.parse(stats)
+        else
+          # Puma >=5 uses symbol.
+          stats = JSON.parse(stats.to_json)
+        end
         stats['usage'] = (1 - stats['pool_capacity'].to_f / stats['max_threads']).round(2)
         stats
       end
