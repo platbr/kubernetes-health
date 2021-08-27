@@ -37,8 +37,8 @@ module Puma
             http_code = 404
           end
         rescue => e
-          Rails.logger.error e.message
-          Rails.logger.error e.backtrace.join("\n")
+          puts e.message
+          puts e.backtrace.join("\n")
           http_code = 500
           content = ''
         end
