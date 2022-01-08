@@ -128,7 +128,7 @@ Kubernetes::Health::Config.response_format = 'json'
 ## Customizing requests logs
 
 ```
-Kubernetes::Health::Config.request_log_callback = lambda { |req, http_code|
-  Rails.logger.debug "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}"  rescue nil
+Kubernetes::Health::Config.request_log_callback = lambda { |req, http_code, content|
+  Rails.logger.debug "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}\n#{content}"  rescue nil
 }
 ```
