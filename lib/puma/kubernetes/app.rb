@@ -28,9 +28,9 @@ module Puma
           when ::Kubernetes::Health::Config.route_metrics
             http_code = 200
             if ::Kubernetes::Health::Config.response_format == 'json'
-              content = include_puma_key_prefix(include_usage(@launcher.stats)).to_json
+              content = include_puma_key_prefix(include_usage(merge_worker_status_if_needed(@launcher.stats))).to_json
             else
-              @parser.parse include_usage(@launcher.stats)
+              @parser.parse include_usage(merge_worker_status_if_needed(@launcher.stats))
               content = Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)
             end
           else
@@ -44,6 +44,15 @@ module Puma
         end
         ::Kubernetes::Health::Config.request_log_callback.call(req, http_code, content)
         [http_code, type, [content]]
+      end
+
+      def merge_worker_status_if_needed(stats)
+        return stats unless stats[:worker_status]
+
+        merded_stats = stats[:worker_status].map { |ws| ws[:last_status] }.inject({}) { |sum, hash| sum.merge(hash) { |_key, val1, val2| val1+val2 } }
+        merded_stats[:puma_started_at] = stats[:puma_started_at]
+        merded_stats[:worker_status] = stats[:worker_status]
+        merded_stats
       end
 
       def include_usage(stats)
