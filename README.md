@@ -1,21 +1,22 @@
 # Kubernetes::Health
-
-This gem allows kubernetes monitoring your app while it is running migrates and after it starts.
+This gems opens a HTTP port for monitoring your rails app while it is running Migrates, Sidekiq and Puma.
 
 # Features
-- add routes `/_readiness`, `/_liveness` on rails stack.
-- add routes `/_readiness`, `/_liveness` and `/_metrics` as a puma plugin.
-- metrics are prometheus compatible (code copied from `puma-metrics` gem) or json.
-- allow custom checks for `/_readiness` and `/_liveness`.
+- Puma and Sidekiq metrics for autoscaling.
+- Prometheus and JSON metrics.
+- add routes `/_readiness`, `/_liveness` on Rails Stack.
+- add routes `/_readiness`, `/_liveness` and `/_metrics` as a puma plugin (code copied from `puma-metrics` gem).
 - add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs. (optional)
+- add routes `/_readiness` and `/_liveness` while `sidekiq` runs. (optional)
 - add support to avoid parallel running of `rake db:migrate` while keep kubernetes waiting. (optional)
-
+- allow custom checks for `/_readiness` and `/_liveness`.
+ 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'kubernetes-health', '~> 3.5'
+gem 'kubernetes-health', '~> 3.6'
 ```
 
 ## Enabling puma plugin
@@ -48,6 +49,7 @@ In Kubernetes you need to configure your deployment `readinessProbe` and `livene
 ```
 
 Setting `failureThreshold` is import to avoid problems when app finish migrates and is starting the web process.
+
 ## Enabling monitoring while `rake db:migrate` runs
 
 Your Dockerfile's entry script needs to run migrates before start your web app.
@@ -60,9 +62,22 @@ or add in your `application.rb`.
 # default: false
 Kubernetes::Health::Config.enable_rack_on_migrate = true
 ```
+The defined port at `config/puma.rb` will be used.
 
-### How `rake db:migrate` monitoring works
-It will run a RACK server for `/_readiness` and `/_liveness` routes while `rake db:migrate` is running.
+## Enabling monitoring for `sidekiq`
+
+Add `KUBERNETES_HEALTH_ENABLE_RACK_ON_SIDEKIQ=true` environment variable.
+
+or add in your `application.rb`.
+
+```
+# default: false
+Kubernetes::Health::Config.enable_rack_on_sidekiq = true
+```
+The defined port at `config/puma.rb` will be used.
+
+### How `rake db:migrate` and `sidekiq` monitoring works
+It will run a RACK server for `/_readiness`, `/_liveness` and `/_metrics`.
 
 ## Avoiding migrations running in parallel and making kubernetes happy.
 Rails already avoid migrations running in parallel, but it raise exceptions. This gem will just wait for other migrations without exit.

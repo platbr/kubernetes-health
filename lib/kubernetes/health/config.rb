@@ -5,6 +5,7 @@ module Kubernetes
       @@ready_if = lambda { true }
       @@enable_lock_on_migrate = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_LOCK_ON_MIGRATE']
       @@enable_rack_on_migrate = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_RACK_ON_MIGRATE']
+      @@enable_rack_on_sidekiq = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_RACK_ON_SIDEKIQ']
       @@route_liveness = '/_liveness'
       @@route_readiness = '/_readiness'
       @@route_metrics = '/_metrics'
@@ -55,6 +56,14 @@ module Kubernetes
 
       def self.enable_rack_on_migrate=(value)
         @@enable_rack_on_migrate = value
+      end
+
+      def self.enable_rack_on_sidekiq
+        @@enable_rack_on_sidekiq
+      end
+
+      def self.enable_rack_on_sidekiq=(value)
+        @@enable_rack_on_sidekiq = value
       end
 
       def self.route_metrics
