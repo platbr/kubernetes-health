@@ -3,7 +3,7 @@ This gems opens a HTTP port for monitoring your rails app while it is running Mi
 
 # Features
 - Puma and Sidekiq metrics for autoscaling.
-- Prometheus and JSON metrics.
+- Prometheus and JSON metrics (Tested using https://github.com/zalando-incubator/kube-metrics-adapter and JSON format).
 - add routes `/_readiness`, `/_liveness` on Rails Stack.
 - add routes `/_readiness`, `/_liveness` and `/_metrics` as a puma plugin at another port to avoid problems when your app get busy. (code copied from `puma-metrics` gem).
 - add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs. (optional)
