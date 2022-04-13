@@ -10,9 +10,9 @@ end
 
 task :server do
   require 'puma'
-  require 'kubernetes/health/puma/configuration'
-  require 'kubernetes/health/puma/events'
-  require 'kubernetes/health/puma/plugin/kubernetes'
+  require 'puma/configuration'
+  require 'puma/events'
+  require 'puma/plugin/kubernetes'
 
   configuration = Puma::Configuration.new do |config|
     config.bind 'tcp://127.0.0.1:0'
