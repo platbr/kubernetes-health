@@ -13,14 +13,15 @@ module Kubernetes
         when Kubernetes::Health::Config.route_metrics
           http_code = 200
 
-          @sidekiq_metrics = sidekiq_metrics
+          sidekiq_metrics = generate_sidekiq_metrics
 
           if ::Kubernetes::Health::Config.response_format == 'json'
-            content = @sidekiq_metrics.to_json
+            content = sidekiq_metrics.to_json
           else
-            prometheus_registry.get(:sidekiq_capacity).set({}, @sidekiq_metrics[:sidekiq_capacity])
-            prometheus_registry.get(:sidekiq_busy).set({}, @sidekiq_metrics[:sidekiq_busy])
-            prometheus_registry.get(:sidekiq_usage).set({}, @sidekiq_metrics[:sidekiq_usage])
+            prometheus_registry = generate_prometheus_registry
+            prometheus_registry.get(:sidekiq_capacity).set({}, sidekiq_metrics[:sidekiq_capacity])
+            prometheus_registry.get(:sidekiq_busy).set({}, sidekiq_metrics[:sidekiq_busy])
+            prometheus_registry.get(:sidekiq_usage).set({}, sidekiq_metrics[:sidekiq_usage])
             content = Prometheus::Client::Formats::Text.marshal(prometheus_registry)
           end
         else
@@ -31,17 +32,15 @@ module Kubernetes
         [http_code, type, [content]]
       end
 
-      def prometheus_registry
-        return @prometheus_registry if @prometheus_registry
-
-        @prometheus_registry = Prometheus::Client.registry
-        @prometheus_registry.gauge(:sidekiq_capacity, 'Sidekiq Threads Number', index: 0)
-        @prometheus_registry.gauge(:sidekiq_busy, 'Sidekiq Busy Threads', index: 0)
-        @prometheus_registry.gauge(:sidekiq_usage, 'Result of sidekiq_busy/sidekiq_capacity', index: 0)
-        @prometheus_registry
+      def generate_prometheus_registry
+        prometheus_registry = Prometheus::Client.registry
+        prometheus_registry.gauge(:sidekiq_capacity, 'Sidekiq Threads Number', index: 0)
+        prometheus_registry.gauge(:sidekiq_busy, 'Sidekiq Busy Threads', index: 0)
+        prometheus_registry.gauge(:sidekiq_usage, 'Result of sidekiq_busy/sidekiq_capacity', index: 0)
+        prometheus_registry
       end
 
-      def sidekiq_metrics
+      def generate_sidekiq_metrics
         sidekiq_info = Sidekiq::ProcessSet.new.to_a.filter { |p| p.identity == Sidekiq.options[:identity] }
 
         stats = {

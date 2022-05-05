@@ -18,19 +18,20 @@ module Puma
           type = {}
           content = ''
           type = ::Kubernetes::Health::Config.response_format == 'json' ? { 'Content-Type' => 'application/json' } : { 'Content-Type' => 'text/plain' }
+          extended_puma_stats = generate_extended_puma_stats
           case req.path_info
           when ::Kubernetes::Health::Config.route_liveness
             i_am_live = ::Kubernetes::Health::Config.live_if.arity.zero? ? ::Kubernetes::Health::Config.live_if.call : ::Kubernetes::Health::Config.live_if.call(req.params)
-            http_code = puma_already_started? && i_am_live ? 200 : 503
+            http_code = puma_already_started?(extended_puma_stats) && i_am_live ? 200 : 503
           when ::Kubernetes::Health::Config.route_readiness
             i_am_ready = ::Kubernetes::Health::Config.ready_if.arity.zero? ? ::Kubernetes::Health::Config.ready_if.call : ::Kubernetes::Health::Config.ready_if.call(req.params)
-            http_code = puma_already_started? && i_am_ready ? 200 : 503
+            http_code = puma_already_started?(extended_puma_stats) && i_am_ready ? 200 : 503
           when ::Kubernetes::Health::Config.route_metrics
             http_code = 200
             if ::Kubernetes::Health::Config.response_format == 'json'
-              content = puma_status_json
+              content = puma_status_json(extended_puma_stats)
             else
-              prometheus_parse_status!
+              prometheus_parse_status!(extended_puma_stats)
               content = Prometheus::Client::Formats::Text.marshal(Prometheus::Client.registry)
             end
           else
@@ -48,20 +49,18 @@ module Puma
 
       private
 
-      def prometheus_parse_status!
+      def prometheus_parse_status!(extended_puma_stats)
         @parser.parse(extended_puma_stats)
       end
 
-      def extended_puma_stats
-        return @extended_puma_stats if @extended_puma_stats
-
+      def generate_extended_puma_stats
         puma_stats = @launcher.stats
         # On puma <= 4 puma_stats is a String
         puma_stats = JSON.parse(puma_stats, symbolize_names: true) unless puma_stats.is_a?(Hash)
         # Including usage stats.
         puma_stats = merge_worker_status(puma_stats) if puma_stats[:worker_status].present?
         puma_stats[:usage] = (1 - puma_stats[:pool_capacity].to_f / puma_stats[:max_threads]).round(2)
-        @extended_puma_stats = puma_stats
+        puma_stats
       end
 
       def merge_worker_status(stats)
@@ -73,7 +72,7 @@ module Puma
         merded_stats
       end
 
-      def puma_status_json
+      def puma_status_json(extended_puma_stats)
         include_puma_key_prefix(extended_puma_stats).to_json
       end
 
@@ -85,7 +84,7 @@ module Puma
         result
       end
 
-      def puma_already_started?
+      def puma_already_started?(extended_puma_stats)
         if extended_puma_stats[:booted_workers].present?
           # Cluster Mode
           extended_puma_stats[:booted_workers].positive?
