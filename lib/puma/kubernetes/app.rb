@@ -59,7 +59,7 @@ module Puma
         puma_stats = JSON.parse(puma_stats, symbolize_names: true) unless puma_stats.is_a?(Hash)
         # Including usage stats.
         puma_stats = merge_worker_status(puma_stats) if puma_stats[:worker_status].present?
-        puma_stats[:usage] = (1 - puma_stats[:pool_capacity].to_f / puma_stats[:max_threads]).round(2)
+        puma_stats[:usage] = (1 - puma_stats[:pool_capacity].to_f / puma_stats[:max_threads]).round(2) if puma_stats[:pool_capacity].present?
         puma_stats
       end
 
