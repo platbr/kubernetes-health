@@ -10,9 +10,7 @@ Puma::Plugin.create do
     app = Puma::Kubernetes::App.new launcher
     uri = URI.parse str
 
-    kubernetes = Puma::Server.new app, launcher.events
-    kubernetes.min_threads = 0
-    kubernetes.max_threads = 1
+    kubernetes = Puma::Server.new app, launcher.events, { min_threads: 0, max_threads: 1 }
 
     case uri.scheme
     when 'tcp'
