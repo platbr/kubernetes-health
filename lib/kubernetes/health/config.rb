@@ -12,7 +12,7 @@ module Kubernetes
       @@response_format = 'prometheus'
 
       @@request_log_callback = lambda { |req, http_code, content|
-        Rails.logger.debug "Kubernetes Health: Rack on Migrate - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}\n#{content}"  rescue nil
+        Rails.logger.debug "Kubernetes Health - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}\n#{content}"  rescue nil
       }
 
       @@lock_or_wait = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_lock(123456789123456789);' }
