@@ -5,6 +5,7 @@ require 'prometheus/client/formats/text'
 module Kubernetes
   module Health
     class RackOnSidekiq
+      
       def call(env)
         req = ::Rack::Request.new(env)
         content = ''
@@ -41,16 +42,17 @@ module Kubernetes
       end
 
       def generate_sidekiq_metrics
-        sidekiq_info = Sidekiq::ProcessSet.new.to_a.filter { |p| p.identity == Sidekiq.options[:identity] }
+        sidekiq_info = Sidekiq::ProcessSet.new.to_a.filter { |p| p.identity == SidekiqOptionsResolver[:identity] }
 
         stats = {
-          sidekiq_capacity: Sidekiq.options[:concurrency],
+          sidekiq_capacity: SidekiqOptionsResolver[:concurrency],
           sidekiq_busy: sidekiq_info.size.zero? ? 0 : sidekiq_info[0]['busy']
         }
 
         stats[:sidekiq_usage] = (stats[:sidekiq_busy] / stats[:sidekiq_capacity].to_f).round(2)
         stats
       end
+
     end
   end
 end
