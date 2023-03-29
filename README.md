@@ -131,6 +131,12 @@ Kubernetes::Health::Config.route_liveness = '/liveness'
 Kubernetes::Health::Config.route_readiness = '/readiness'
 Kubernetes::Health::Config.route_metrics = '/metrics'
 ```
+or using env
+```
+KUBERNETES_HEALTH_LIVENESS_ROUTE='/liveness'
+KUBERNETES_HEALTH_READINESS_ROUTE='/readiness'
+KUBERNETES_HEALTH_RESPONSE_FORMAT='/metrics'
+```
 
 ## Response format
 If you are using `https://github.com/zalando-incubator/kube-metrics-adapter` you will want to use `json` format.
@@ -138,6 +144,10 @@ If you are using `https://github.com/zalando-incubator/kube-metrics-adapter` you
 Default is `prometheus`.
 ```
 Kubernetes::Health::Config.response_format = 'json'
+```
+or using env
+```
+KUBERNETES_HEALTH_RESPONSE_FORMAT=json
 ```
 
 ## Customizing requests logs
