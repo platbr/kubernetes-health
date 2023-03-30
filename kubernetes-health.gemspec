@@ -31,6 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_dependency "rack"
   spec.add_dependency "rails"
-  spec.add_runtime_dependency 'prometheus-client', '~> 1.0'
+  spec.add_runtime_dependency 'prometheus-client', '>= 1.0', '< 5'
   spec.add_runtime_dependency 'puma', '>= 5.0'
 end

@@ -19,10 +19,9 @@ module Kubernetes
           if ::Kubernetes::Health::Config.response_format == 'json'
             content = sidekiq_metrics.to_json
           else
-            prometheus_registry = generate_prometheus_registry
-            prometheus_registry.get(:sidekiq_capacity).set({}, sidekiq_metrics[:sidekiq_capacity])
-            prometheus_registry.get(:sidekiq_busy).set({}, sidekiq_metrics[:sidekiq_busy])
-            prometheus_registry.get(:sidekiq_usage).set({}, sidekiq_metrics[:sidekiq_usage])
+            prometheus_registry.get(:sidekiq_capacity).set(sidekiq_metrics[:sidekiq_capacity])
+            prometheus_registry.get(:sidekiq_busy).set(sidekiq_metrics[:sidekiq_busy])
+            prometheus_registry.get(:sidekiq_usage).set(sidekiq_metrics[:sidekiq_usage])
             content = Prometheus::Client::Formats::Text.marshal(prometheus_registry)
           end
         else
@@ -33,12 +32,14 @@ module Kubernetes
         [http_code, type, [content]]
       end
 
-      def generate_prometheus_registry
-        prometheus_registry = Prometheus::Client.registry
-        prometheus_registry.gauge(:sidekiq_capacity, 'Sidekiq Threads Number', index: 0)
-        prometheus_registry.gauge(:sidekiq_busy, 'Sidekiq Busy Threads', index: 0)
-        prometheus_registry.gauge(:sidekiq_usage, 'Result of sidekiq_busy/sidekiq_capacity', index: 0)
-        prometheus_registry
+      def prometheus_registry
+        return @prometheus_registry unless @prometheus_registry.nil?
+
+        @prometheus_registry = Prometheus::Client.registry
+        @prometheus_registry.gauge(:sidekiq_capacity, docstring: 'Sidekiq Threads Number')
+        @prometheus_registry.gauge(:sidekiq_busy, docstring: 'Sidekiq Busy Threads')
+        @prometheus_registry.gauge(:sidekiq_usage, docstring: 'Result of sidekiq_busy/sidekiq_capacity')
+        @prometheus_registry
       end
 
       def generate_sidekiq_metrics
