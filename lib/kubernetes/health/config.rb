@@ -1,8 +1,10 @@
 module Kubernetes
   module Health
     class Config
+      METRICS_PORT_FROM_PUMA_CONFIG = File.read(File.join(Rails.root, 'config', 'puma.rb')).match(/kubernetes_url\s.+:(?<metrics_port>\d+)/)['metrics_port'] rescue nil
       @@live_if = lambda { true }
       @@ready_if = lambda { true }
+      @@metrics_port = ENV['KUBERNETES_HEALTH_METRICS_PORT'] || METRICS_PORT_FROM_PUMA_CONFIG || 9393
       @@enable_lock_on_migrate = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_LOCK_ON_MIGRATE']
       @@enable_rack_on_migrate = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_RACK_ON_MIGRATE']
       @@enable_rack_on_sidekiq = [true, 'true'].include? ENV['KUBERNETES_HEALTH_ENABLE_RACK_ON_SIDEKIQ']
@@ -112,6 +114,14 @@ module Kubernetes
 
       def self.response_format=(value)
         @@response_format = value
+      end
+
+      def self.metrics_port
+        @@metrics_port
+      end
+
+      def self.metrics_port=(value)
+        @@metrics_port = value
       end
     end
   end

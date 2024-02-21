@@ -3,7 +3,7 @@ require 'puma/kubernetes/dsl'
 Puma::Plugin.create do
   # rubocop:disable Kubernetes/MethodLength, Kubernetes/AbcSize
   def start(launcher)
-    str = launcher.options[:kubernetes_url] || 'tcp://0.0.0.0:9393'
+    str = launcher.options[:kubernetes_url] || "tcp://0.0.0.0:#{Kubernetes::Health::Config.metrics_port}"
 
     require 'puma/kubernetes/app'
 

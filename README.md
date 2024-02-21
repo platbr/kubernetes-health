@@ -16,7 +16,7 @@ This gem open a HTTP port for monitoring your rails app while it is running Migr
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'kubernetes-health', '~> 3.6'
+gem 'kubernetes-health', '~> 3.7'
 ```
 
 ## Enabling puma plugin
@@ -62,7 +62,7 @@ or add in your `application.rb`.
 # default: false
 Kubernetes::Health::Config.enable_rack_on_migrate = true
 ```
-The defined port at `config/puma.rb` will be used.
+The defined port at `config/puma.rb` will be used but can be overrided by `KUBERNETES_HEALTH_METRICS_PORT` env var.
 
 ## Enabling monitoring for `sidekiq`
 
@@ -74,7 +74,7 @@ or add in your `application.rb`.
 # default: false
 Kubernetes::Health::Config.enable_rack_on_sidekiq = true
 ```
-The defined port at `config/puma.rb` will be used.
+The defined port at `config/puma.rb` will be used but can be overrided by `KUBERNETES_HEALTH_METRICS_PORT` env var.
 
 ### How `rake db:migrate` and `sidekiq` monitoring works
 It will run a RACK server for `/_readiness`, `/_liveness` and `/_metrics`.

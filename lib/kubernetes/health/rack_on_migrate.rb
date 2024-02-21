@@ -11,7 +11,7 @@ module Kubernetes
         else
           http_code = 404
         end
-        ::Kubernetes::Health::Config.request_log_callback.call(req, http_code)
+        ::Kubernetes::Health::Config.request_log_callback.call(req, http_code, '')
         [http_code, {}, []]
       end
     end

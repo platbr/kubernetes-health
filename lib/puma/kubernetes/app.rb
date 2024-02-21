@@ -54,7 +54,9 @@ module Puma
       end
 
       def generate_extended_puma_stats
-        puma_stats = @launcher&.stats || {}
+        return {} if @launcher.nil?
+
+        puma_stats = @launcher.stats
         # On puma <= 4 puma_stats is a String
         puma_stats = JSON.parse(puma_stats, symbolize_names: true) unless puma_stats.is_a?(Hash)
         # Including usage stats.
