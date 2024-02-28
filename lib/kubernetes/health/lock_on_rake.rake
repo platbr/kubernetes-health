@@ -1,5 +1,5 @@
 namespace :kubernetes_health do
-  task :lock_on_migrate do
+  task :lock_on_rake do
     Rails.logger.info "Kubernetes Health: Lock on Migrate - Locking or waiting started."
     Kubernetes::Health::Config.lock_or_wait.call
     Rails.logger.info "Kubernetes Health: Lock on Migrate - Locking or waiting finished."
@@ -10,4 +10,3 @@ namespace :kubernetes_health do
     }
   end
 end
-Rake::Task['db:migrate'].enhance(['kubernetes_health:lock_on_migrate'])

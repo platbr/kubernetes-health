@@ -17,7 +17,7 @@ module Kubernetes
         Rails.logger.debug "Kubernetes Health - Request: Path: #{req.path_info} / Params: #{req.params} /  HTTP Code: #{http_code}\n#{content}"  rescue nil
       }
 
-      @@lock_or_wait = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_lock(123456789123456789);' }
+      @@lock_or_wait = lambda { ActiveRecord::Base.connection.execute "SET lock_timeout TO '3600s'; SELECT pg_advisory_lock(123456789123456789);" }
       @@unlock = lambda { ActiveRecord::Base.connection.execute 'select pg_advisory_unlock(123456789123456789);' }
 
       def self.lock_or_wait
