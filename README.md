@@ -50,7 +50,7 @@ In Kubernetes you need to configure your deployment `readinessProbe` and `livene
 
 Setting `failureThreshold` is import to avoid problems when app finish migrates and is starting the web process.
 
-## Enabling monitoring while `rake db:migrate` runs
+## Enabling liveness/readiness routes while `rake db:migrate` runs
 
 Your Dockerfile's entry script needs to run migrates before start your web app.
 
@@ -64,7 +64,26 @@ Kubernetes::Health::Config.enable_rack_on_migrate = true
 ```
 The defined port at `config/puma.rb` will be used but can be overrided by `KUBERNETES_HEALTH_METRICS_PORT` env var.
 
-## Enabling monitoring for `sidekiq`
+## Enabling liveness/readiness routes while any `rake` tasks runs
+
+If you need to run another rake tasks than `db:migrate`, like `assets:precompile`, you can enable the monitoring routes by this way:
+
+Add a `rake` file enhancing the original task by using `kubernetes_health:rack_on_rake` task. For example:
+
+```
+# File: lib/tasks/kubernetes_health_enable_rack_on_assets_precompile.rake
+Rake::Task['assets:precompile'].enhance(['kubernetes_health:rack_on_rake'])
+```
+
+```
+# File: lib/tasks/kubernetes_health_enable_rack_on_assets_clobber.rake
+Rake::Task['assets:clobber'].enhance(['kubernetes_health:rack_on_rake'])
+```
+
+I do recomend doing some check to make it only enables in K8S environment.
+The defined port at `config/puma.rb` will be used but can be overrided by `KUBERNETES_HEALTH_METRICS_PORT` env var.
+
+## Enabling liveness/readiness routes for `sidekiq`
 
 Add `KUBERNETES_HEALTH_ENABLE_RACK_ON_SIDEKIQ=true` environment variable.
 
@@ -76,8 +95,9 @@ Kubernetes::Health::Config.enable_rack_on_sidekiq = true
 ```
 The defined port at `config/puma.rb` will be used but can be overrided by `KUBERNETES_HEALTH_METRICS_PORT` env var.
 
-### How `rake db:migrate` and `sidekiq` monitoring works
+### How `rake` and `sidekiq` monitoring works
 It will run a RACK server for `/_readiness`, `/_liveness` and `/_metrics`.
+The liveness route will respond using `200` but readiness `503`.
 
 ## Avoiding migrations running in parallel and making kubernetes happy.
 Rails already avoid migrations running in parallel, but it raise exceptions. This gem will just wait for other migrations without exit.
@@ -97,7 +117,7 @@ Kubernetes::Health::Config.enable_lock_on_migrate = true
 By default it is working for PostgreSQL, but you can customize it using a lambda:
 ```
 Kubernetes::Health::Config.lock_or_wait = lambda {
-    ActiveRecord::Base.connection.execute 'select pg_advisory_lock(123456789123456789);'
+  ActiveRecord::Base.connection.execute "SET lock_timeout TO '3600s'; SELECT pg_advisory_lock(123456789123456789);"
 }
 
 Kubernetes::Health::Config.unlock = lambda {

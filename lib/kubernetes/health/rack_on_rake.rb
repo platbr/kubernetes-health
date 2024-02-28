@@ -1,6 +1,6 @@
 module Kubernetes
   module Health
-    class RackOnMigrate
+    class RackOnRake
       def call(env)
         req = ::Rack::Request.new(env)
         case req.path_info
