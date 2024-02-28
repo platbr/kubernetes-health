@@ -7,7 +7,7 @@ This gem opens a dedicated HTTP port to allow Kubernetes to monitor your Rails a
 - add routes `/_readiness`, `/_liveness` on Rails Stack.
 - add routes `/_readiness`, `/_liveness` and `/_metrics` as a puma plugin at another port to avoid problems when your app get busy. (code copied from `puma-metrics` gem).
 - add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs. (optional)
-- add routes `/_readiness` and `/_liveness` while `sidekiq` runs. (optional)
+- add routes `/_metrics` while `sidekiq` runs. (optional)
 - add support to avoid parallel running of `rake db:migrate` while keep kubernetes waiting (PostgreSQL required).
 - allow custom checks for `/_readiness` and `/_liveness`.
  
@@ -96,7 +96,7 @@ Kubernetes::Health::Config.enable_rack_on_sidekiq = true
 The defined port at `config/puma.rb` will be used but can be overrided by `KUBERNETES_HEALTH_METRICS_PORT` env var.
 
 ### How `rake` and `sidekiq` monitoring works
-It will run a RACK server for `/_readiness`, `/_liveness` and `/_metrics`.
+It will run a rack server for `/_readiness`, `/_liveness` and `/_metrics` for rake and `/_metrics` for Sidekiq.
 The liveness route will respond using `200` but readiness `503`.
 
 ## Avoiding migrations running in parallel and making kubernetes happy.
