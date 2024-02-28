@@ -100,7 +100,7 @@ It will run a RACK server for `/_readiness`, `/_liveness` and `/_metrics`.
 The liveness route will respond using `200` but readiness `503`.
 
 ## Avoiding migrations running in parallel and making kubernetes happy.
-Rails already avoid migrations running in parallel, but it raise exceptions. This gem will just wait for other migrations without exit.
+Rails already avoid migrations running in parallel, but it raises exceptions. This gem will just wait for other migrations without exit.
 If you enable `rack_on_migrate` together with this, kubernetes will just wait, avoiding erros.
 
 
