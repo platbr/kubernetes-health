@@ -80,7 +80,7 @@ Rake::Task['assets:precompile'].enhance(['kubernetes_health:rack_on_rake'])
 Rake::Task['assets:clobber'].enhance(['kubernetes_health:rack_on_rake'])
 ```
 
-I do recomend doing some check to make it only enables in K8S environment.
+I do recommend doing some checks to make it only enabled in the K8S environment. The defined port at config/puma.rb will be used but can be overridden by KUBERNETES_HEALTH_METRICS_PORT env var.
 The defined port at `config/puma.rb` will be used but can be overrided by `KUBERNETES_HEALTH_METRICS_PORT` env var.
 
 ## Enabling liveness/readiness routes for `sidekiq`
