@@ -66,7 +66,7 @@ The defined port at `config/puma.rb` will be used but can be overrided by `KUBER
 
 ## Enabling liveness/readiness routes while any `rake` tasks runs
 
-If you need to run other rake tasks than `db:migrate`, like `assets:precompile`, you can enable the monitoring routes by this way:
+If you need to run another rake tasks than `db:migrate`, like `assets:precompile`, you can enable the monitoring routes by this way:
 
 Add a `rake` file enhancing the original task by using `kubernetes_health:rack_on_rake` task. For example:
 
