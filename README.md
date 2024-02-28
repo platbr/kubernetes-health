@@ -1,5 +1,5 @@
 # Kubernetes::Health
-This gem open a HTTP port for monitoring your rails app while it is running Migrates, Sidekiq and Puma.
+This gem opens a dedicated HTTP port to allow Kubernetes to monitor your Rails app while it is running migrations, Rake tasks, Sidekiq, or Puma.
 
 # Features
 - Puma and Sidekiq metrics for autoscaling.
