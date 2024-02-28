@@ -22,7 +22,7 @@ module Puma
           case req.path_info
           when ::Kubernetes::Health::Config.route_liveness
             i_am_live = ::Kubernetes::Health::Config.live_if.arity.zero? ? ::Kubernetes::Health::Config.live_if.call : ::Kubernetes::Health::Config.live_if.call(req.params)
-            http_code = puma_already_started?(extended_puma_stats) && i_am_live ? 200 : 503
+            http_code = i_am_live ? 200 : 503
           when ::Kubernetes::Health::Config.route_readiness
             i_am_ready = ::Kubernetes::Health::Config.ready_if.arity.zero? ? ::Kubernetes::Health::Config.ready_if.call : ::Kubernetes::Health::Config.ready_if.call(req.params)
             http_code = puma_already_started?(extended_puma_stats) && i_am_ready ? 200 : 503
