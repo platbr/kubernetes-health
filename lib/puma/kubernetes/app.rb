@@ -89,12 +89,12 @@ module Puma
       end
 
       def puma_already_started?(extended_puma_stats)
-        if extended_puma_stats[:booted_workers].present?
+        if extended_puma_stats[:booted_workers].to_i.present?
           # Cluster Mode
-          extended_puma_stats[:booted_workers].positive?
+          extended_puma_stats[:booted_workers].to_i.positive?
         else
           # Single Mode
-          extended_puma_stats[:running].positive?
+          extended_puma_stats[:running].to_i.positive?
         end
       end
     end
