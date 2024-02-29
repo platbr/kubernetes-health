@@ -54,11 +54,13 @@ module Puma
       end
 
       def generate_extended_puma_stats
-        return {} if @launcher.nil?
-
-        puma_stats = @launcher.stats
+        begin
+          puma_stats = @launcher.stats
+        rescue NoMethodError
+          puma_stats = {}
+        end
         # On puma <= 4 puma_stats is a String
-        puma_stats = JSON.parse(puma_stats, symbolize_names: true) unless puma_stats.is_a?(Hash)
+        puma_stats = JSON.parse(puma_stats, symbolize_names: true) if puma_stats.is_a?(String)
         # Including usage stats.
         puma_stats = merge_worker_status(puma_stats) if puma_stats[:worker_status].present?
         puma_stats[:usage] = (1 - puma_stats[:pool_capacity].to_f / puma_stats[:max_threads]).round(2) if puma_stats[:pool_capacity].present?
