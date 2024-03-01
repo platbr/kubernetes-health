@@ -89,7 +89,7 @@ module Puma
       end
 
       def puma_already_started?(extended_puma_stats)
-        return false if extended_puma_stats.empty
+        return false if extended_puma_stats.empty?
 
         if extended_puma_stats[:booted_workers].present?
           # Cluster Mode
