@@ -7,6 +7,8 @@ module Kubernetes
     end
 
     def readiness
+      puts "arity: " + Kubernetes::Health::Config.ready_if.arity
+      puts "call: " + Kubernetes::Health::Config.ready_if.call
       i_am_ready = Kubernetes::Health::Config.ready_if.arity == 0 ? Kubernetes::Health::Config.ready_if.call : Kubernetes::Health::Config.ready_if.call(params)
       return head 200 if i_am_ready
       head 503
