@@ -5,7 +5,6 @@ require 'prometheus/client/formats/text'
 module Kubernetes
   module Health
     class RackOnSidekiq
-      
       def call(env)
         req = ::Rack::Request.new(env)
         content = ''
@@ -53,7 +52,6 @@ module Kubernetes
         stats[:sidekiq_usage] = (stats[:sidekiq_busy] / stats[:sidekiq_capacity].to_f).round(2)
         stats
       end
-
     end
   end
 end
