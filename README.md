@@ -16,7 +16,7 @@ This gem opens a dedicated HTTP port to allow Kubernetes to monitor your Rails a
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'kubernetes-health', '~> 3.12.1'
+gem 'kubernetes-health', '~> 3.13'
 ```
 
 ## Enabling puma plugin
