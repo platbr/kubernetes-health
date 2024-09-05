@@ -1,5 +1,5 @@
 require 'rack'
-require "kubernetes/health/rack_on_rake"
+require 'kubernetes/health/rack_on_rake'
 
 namespace :kubernetes_health do
   task :rack_on_rake do
