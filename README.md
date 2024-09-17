@@ -8,7 +8,7 @@ This gem opens a dedicated HTTP port to allow Kubernetes to monitor your Rails a
 - add routes `/_readiness`, `/_liveness` and `/_metrics` as a puma plugin at another port to avoid problems when your app get busy. (code copied from `puma-metrics` gem).
 - add routes `/_readiness` and `/_liveness` while `rake db:migrate` runs. (optional)
 - add routes `/_metrics` while `sidekiq` runs. (optional)
-- add support to avoid parallel running of `rake db:migrate` while keep kubernetes waiting (PostgreSQL required).
+- add support to avoid parallel running of `rake db:migrate` while keep kubernetes waiting (PostgreSQL required for default config, read `Customizing locking` section.).
 - allow custom checks for `/_readiness` and `/_liveness`.
  
 ## Installation
