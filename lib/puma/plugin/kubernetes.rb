@@ -16,7 +16,7 @@ Puma::Plugin.create do
 
     case uri.scheme
     when 'tcp'
-      log_writer.log "* Starting kubernetes-healh server on #{str}"
+      log_writer.log "* Starting kubernetes-health server on #{str}"
       puma_server.add_tcp_listener uri.host, uri.port
     else
       log_writer.error "Invalid control URI: #{str}"
